@@ -1,0 +1,49 @@
+{
+  "accounts": [
+    {
+      "id": "1",
+      "name": "Myrella Açai",
+      "balance": 120
+    },
+    {
+      "id": 2,
+      "name": "Jose das Couves",
+      "balance": 100
+    },
+    {
+      "id": 3,
+      "name": "Maria Alface",
+      "balance": 100
+    },
+    {
+      "id": 4,
+      "name": "Rafael Beterraba",
+      "balance": 100
+    },
+    {
+      "id": 5,
+      "name": "Vivian Beterraba",
+      "balance": 100
+    },
+    {
+      "id": 6,
+      "name": "Jorge Tomate",
+      "balance": 120
+    },
+    {
+      "id": 7,
+      "name": "Bruna Hortelã",
+      "balance": 120
+    },
+    {
+      "id": 8,
+      "name": "João Coentro",
+      "balance": 120
+    },
+    {
+      "id": "9",
+      "name": "Tereza Manga",
+      "balance": 99
+    }
+  ]
+}
