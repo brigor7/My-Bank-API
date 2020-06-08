@@ -1,54 +1,33 @@
 var express = require('express');
 var router = express.Router();
 
-var fs = require('fs');
-
-//Lendo os dados da API e escrevendo arquivo json
-router.post('/', (req, res) => {
-  let account = req.body;
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
-      let json = JSON.parse(data);
-      account = { id: json.nextId++, ...account };
-      json.accounts.push(account);
-      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
-        if (err) throw err;
-      });
-      res.end;
-    } catch (error) {
-      res.status(400).send({ error: err.message });
-    }
-  });
-});
+var fs = require('fs').promises;
 
 /**Consulta tranzendo todos os dados */
 router.get('/', (_, res) => {
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       res.send(json);
-    } catch (error) {
+    })
+    .catch((error) => {
       res.end().send('Erro na leitura do arquivo');
-    }
-  });
+    });
 });
 
 /**Consulta trazendo resultado por parametro id */
 router.get('/:id', (req, res) => {
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       const account = json.accounts.find(
         (account) => account.id == req.params.id
       );
       res.send(account);
-    } catch (error) {
+    })
+    .catch((err) => {
       res.status(400).send({ error: err.message });
-    }
-  });
+    });
 });
 
 router.delete('/:id', (req, res) => {
@@ -90,6 +69,26 @@ router.put('/:id', (req, res) => {
   });
 });
 
+//Lendo os dados da API e escrevendo arquivo json
+router.post('/', (req, res) => {
+  let account = req.body;
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
+    try {
+      if (err) throw err;
+      let json = JSON.parse(data);
+      account = { id: json.nextId++, ...account };
+      json.accounts.push(account);
+      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
+        if (err) throw err;
+      });
+      res.end;
+    } catch (error) {
+      res.status(400).send({ error: err.message });
+    }
+  });
+});
+
+/**Realização de transação com deposito e saque em balance */
 router.post('/transaction', (req, res) => {
   let params = req.body;
   fs.readFile(global.fileName, 'utf8', (err, data) => {
