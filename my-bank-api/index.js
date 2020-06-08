@@ -50,6 +50,7 @@ app.post('/account', (req, res) => {
   });
 });
 
+/**Consulta tranzendo todos os dados */
 app.get('/account', (_, res) => {
   fs.readFile('accounts.json', 'utf8', (err, data) => {
     if (!err) {
@@ -57,6 +58,21 @@ app.get('/account', (_, res) => {
       res.send(json);
     } else {
       res.end().send('Erro na leitura do arquivo');
+    }
+  });
+});
+
+/**Consulta trazendo resultado por parametro id */
+app.get('/account/:id', (req, res) => {
+  fs.readFile('accounts.json', 'utf8', (err, data) => {
+    if (!err) {
+      let json = JSON.parse(data);
+      const account = json.accounts.find(
+        (account) => account.id == req.params.id
+      );
+      res.send(account);
+    } else {
+      res.status(400).send({ error: err.message });
     }
   });
 });
