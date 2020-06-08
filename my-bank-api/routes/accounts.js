@@ -6,13 +6,13 @@ var fs = require('fs');
 //Lendo os dados da API e escrevendo arquivo json
 router.post('/', (req, res) => {
   let account = req.body;
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
       account = { id: json.nextId++, ...account };
       json.accounts.push(account);
-      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
         if (err) throw err;
       });
       res.end;
@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
 
 /**Consulta tranzendo todos os dados */
 router.get('/', (_, res) => {
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
@@ -37,7 +37,7 @@ router.get('/', (_, res) => {
 
 /**Consulta trazendo resultado por parametro id */
 router.get('/:id', (req, res) => {
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
@@ -52,7 +52,7 @@ router.get('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
@@ -60,7 +60,7 @@ router.delete('/:id', (req, res) => {
         (account) => account.id != req.params.id
       );
       json.accounts = account;
-      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
         res.status(400).send({ error: err.message });
       });
       res.send(json);
@@ -72,7 +72,7 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
   let newAccount = req.body;
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
@@ -80,7 +80,7 @@ router.put('/:id', (req, res) => {
         (account) => account.id == newAccount.id
       );
       json.accounts[oldIndex] = newAccount;
-      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
         res.status(400).send({ error: err.message });
       });
       res.send(newAccount);
@@ -91,16 +91,20 @@ router.put('/:id', (req, res) => {
 });
 
 router.post('/transaction', (req, res) => {
-  let putAccount = req.body;
-  fs.readFile('accounts.json', 'utf8', (err, data) => {
+  let params = req.body;
+  fs.readFile(global.fileName, 'utf8', (err, data) => {
     try {
       if (err) throw err;
       let json = JSON.parse(data);
-      let index = json.accounts.findIndex(
-        (account) => account.id == putAccount.id
-      );
-      json.accounts[index].balance += putAccount.balance;
-      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+      let index = json.accounts.findIndex((account) => account.id == params.id);
+      if (
+        params.balance < 0 &&
+        json.accounts[index].balance + params.balance < 0
+      ) {
+        throw new Error('Não há saldo suficiente');
+      }
+      json.accounts[index].balance += params.balance;
+      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
         res.status(400).send({ error: err.message });
       });
       res.send(json);
