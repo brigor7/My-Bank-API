@@ -104,6 +104,9 @@ app.put('/account/:id', (req, res) => {
         (account) => account.id == newAccount.id
       );
       json.accounts[oldIndex] = newAccount;
+      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+        res.status(400).send({ error: err.message });
+      });
       res.send(newAccount);
     } else {
       res.status(400).send({ error: err.message });
