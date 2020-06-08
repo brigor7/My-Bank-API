@@ -9,21 +9,19 @@ app.use(express.json());
 app.use('/account', accountsRouter);
 
 /**Levantando o servidor e criando o arquivo json caso não exista*/
-app.listen(3000, () => {
+app.listen(3000, async () => {
   try {
-    fs.readFile(global.fileName, 'utf8').catch(() => {
-      const initialJson = {
-        nextId: 1,
-        accounts: [],
-      };
-      fs.writeFile(global.fileName, JSON.stringify(initialJson)).catch(
-        (err) => {
-          console.log(err);
-        }
-      );
-    });
+    await fs.readFile(global.fileName, 'utf8');
+    console.log('API Started!');
   } catch (err) {
-    console.log(error);
+    const initialJson = {
+      nextId: 1,
+      accounts: [],
+    };
+    await fs
+      .writeFile(global.fileName, JSON.stringify(initialJson))
+      .catch((err) => {
+        console.log(err);
+      });
   }
-  console.log('API Started!');
 });
