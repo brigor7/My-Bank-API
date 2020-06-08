@@ -76,3 +76,18 @@ app.get('/account/:id', (req, res) => {
     }
   });
 });
+
+app.delete('/account/:id', (req, res) => {
+  fs.readFile('accounts.json', 'utf8', (err, data) => {
+    if (!err) {
+      let json = JSON.parse(data);
+      let account = json.accounts.filter(
+        (account) => account.id != req.params.id
+      );
+      json.accounts = account;
+      res.send(json);
+    } else {
+      res.status(400).send({ error: err.message });
+    }
+  });
+});
