@@ -31,69 +31,60 @@ router.get('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       let account = json.accounts.filter(
         (account) => account.id != req.params.id
       );
       json.accounts = account;
-      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
-        res.status(400).send({ error: err.message });
-      });
+
+      fs.writeFile(global.fileName, JSON.stringify(json));
       res.send(json);
-    } catch (error) {
-      res.status(400).send({ error: err.message });
-    }
-  });
+    })
+    .catch((err) => {
+      res.sendStatus(400).send({ error: err.message });
+    });
 });
 
 router.put('/:id', (req, res) => {
-  let newAccount = req.body;
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  let params = req.body;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       let oldIndex = json.accounts.findIndex(
-        (account) => account.id == newAccount.id
+        (account) => account.id == params.id
       );
-      json.accounts[oldIndex] = newAccount;
-      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
-        res.status(400).send({ error: err.message });
-      });
-      res.send(newAccount);
-    } catch (error) {
+      json.accounts[oldIndex] = params;
+      fs.writeFile(global.fileName, JSON.stringify(json));
+      res.send(params);
+    })
+    .catch((err) => {
       res.status(400).send({ error: err.message });
-    }
-  });
+    });
 });
 
 //Lendo os dados da API e escrevendo arquivo json
 router.post('/', (req, res) => {
   let account = req.body;
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       account = { id: json.nextId++, ...account };
       json.accounts.push(account);
-      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
-        if (err) throw err;
-      });
-      res.end;
-    } catch (error) {
-      res.status(400).send({ error: err.message });
-    }
-  });
+      fs.writeFile(global.fileName, JSON.stringify(json));
+      res.send(json);
+    })
+    .catch((err) => {
+      res.sendStatus(400).send({ error: err.message });
+    });
 });
 
 /**Realização de transação com deposito e saque em balance */
 router.post('/transaction', (req, res) => {
   let params = req.body;
-  fs.readFile(global.fileName, 'utf8', (err, data) => {
-    try {
-      if (err) throw err;
+  fs.readFile(global.fileName, 'utf8')
+    .then((data) => {
       let json = JSON.parse(data);
       let index = json.accounts.findIndex((account) => account.id == params.id);
       if (
@@ -103,14 +94,12 @@ router.post('/transaction', (req, res) => {
         throw new Error('Não há saldo suficiente');
       }
       json.accounts[index].balance += params.balance;
-      fs.writeFile(global.fileName, JSON.stringify(json), (err) => {
-        res.status(400).send({ error: err.message });
-      });
+      fs.writeFile(global.fileName, JSON.stringify(json));
       res.send(json);
-    } catch (error) {
+    })
+    .catch((error) => {
       res.status(400).send({ error: err.message });
-    }
-  });
+    });
 });
 
 module.exports = router;
