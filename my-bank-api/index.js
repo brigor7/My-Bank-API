@@ -94,3 +94,19 @@ app.delete('/account/:id', (req, res) => {
     }
   });
 });
+
+app.put('/account/:id', (req, res) => {
+  let newAccount = req.body;
+  fs.readFile('accounts.json', 'utf8', (err, data) => {
+    if (!err) {
+      let json = JSON.parse(data);
+      let oldIndex = json.accounts.findIndex(
+        (account) => account.id == newAccount.id
+      );
+      json.accounts[oldIndex] = newAccount;
+      res.send(newAccount);
+    } else {
+      res.status(400).send({ error: err.message });
+    }
+  });
+});
