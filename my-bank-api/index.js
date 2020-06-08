@@ -3,6 +3,7 @@ var fs = require('fs');
 var app = express();
 app.use(express.json());
 
+/**Levantando o servidor e criando o arquivo json caso não exista*/
 app.listen(3000, () => {
   try {
     fs.readFile('accounts.json', 'utf8', (err, data) => {
@@ -22,6 +23,7 @@ app.listen(3000, () => {
   console.log('API Started!');
 });
 
+//Lendo os dados da API e escrevendo arquivo json
 app.post('/account', (req, res) => {
   let account = req.body;
   fs.readFile('accounts.json', 'utf8', (err, data) => {
@@ -48,6 +50,13 @@ app.post('/account', (req, res) => {
   });
 });
 
-app.get('/', (_, res) => {
-  res.send('GET account ok!');
+app.get('/account', (_, res) => {
+  fs.readFile('accounts.json', 'utf8', (err, data) => {
+    if (!err) {
+      let json = JSON.parse(data);
+      res.send(json);
+    } else {
+      res.end().send('Erro na leitura do arquivo');
+    }
+  });
 });
