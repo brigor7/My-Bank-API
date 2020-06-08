@@ -123,6 +123,10 @@ app.post('/account/transaction', (req, res) => {
         (account) => account.id == putAccount.id
       );
       json.accounts[index].balance += putAccount.balance;
+      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+        res.status(400).send({ error: err.message });
+      });
+      res.send(json);
     } else {
       res.status(400).send({ error: err.message });
     }
