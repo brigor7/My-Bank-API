@@ -1,8 +1,11 @@
-const express = require('express');
-const fs = require('fs').promises;
+import express from 'express';
+import winston from 'winston';
+import { promises } from 'fs';
+import accountsRouter from './routes/accounts.js';
+
 const app = express();
-const accountsRouter = require('./routes/accounts.js');
-const winston = require('winston');
+const readFile = promises.readFile;
+const writeFile = promises.writeFile;
 
 global.fileName = 'accounts.json';
 
@@ -29,17 +32,17 @@ app.use('/account', accountsRouter);
 /**Levantando o servidor e criando o arquivo json caso não exista*/
 app.listen(3000, async () => {
   try {
-    await fs.readFile(global.fileName, 'utf8');
+    await readFile(global.fileName, 'utf8');
     logger.info('API Started!');
   } catch (err) {
     const initialJson = {
       nextId: 1,
       accounts: [],
     };
-    await fs
-      .writeFile(global.fileName, JSON.stringify(initialJson))
-      .catch((err) => {
+    await writeFile(global.fileName, JSON.stringify(initialJson)).catch(
+      (err) => {
         logger.console.error(err);
-      });
+      }
+    );
   }
 });
