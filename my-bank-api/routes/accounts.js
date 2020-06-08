@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs').promises;
+const express = require('express');
+const router = express.Router();
+const fs = require('fs').promises;
 
 /**Consulta tranzendo todos os dados */
 router.get('/', async (_, res) => {
@@ -9,7 +9,9 @@ router.get('/', async (_, res) => {
     let json = JSON.parse(data);
     delete json.nextId;
     res.send(json);
+    logger.info(`GET /Account ${JSON.stringify(json)}`);
   } catch (err) {
+    logger.error(err);
     res.sendStatus(400).send('Erro na leitura do arquivo');
   }
 });
@@ -23,6 +25,8 @@ router.get('/:id', async (req, res) => {
       (account) => account.id == req.params.id
     );
     res.send(account);
+
+    logger.info(`GET /Account/:id ${JSON.stringify(account)}`);
   } catch (err) {
     res.status(400).send({ error: err.message });
   }
@@ -39,7 +43,10 @@ router.delete('/:id', async (req, res) => {
 
     await fs.writeFile(global.fileName, JSON.stringify(json));
     res.send(json);
+
+    logger.info(`DELETE /Account/:id -${JSON.stringify(json)}`);
   } catch (err) {
+    logger.error(err);
     res.sendStatus(400).send({ error: err.message });
   }
 });
@@ -55,7 +62,10 @@ router.put('/:id', async (req, res) => {
     json.accounts[oldIndex] = params;
     await fs.writeFile(global.fileName, JSON.stringify(json));
     res.send(params);
+
+    logger.info(`PUT /Account/:id -${params}`);
   } catch (err) {
+    logger.error(err);
     res.sendStatus(400).send({ error: err.message });
   }
 });
@@ -70,7 +80,10 @@ router.post('/', async (req, res) => {
     json.accounts.push(account);
     await fs.writeFile(global.fileName, JSON.stringify(json));
     res.send(json);
+
+    logger.info(`POST /Account -${JSON.stringify(json)}`);
   } catch (err) {
+    logger.error(err);
     res.sendStatus(400).send({ error: err.message });
   }
 });
@@ -91,7 +104,10 @@ router.post('/transaction', async (req, res) => {
     json.accounts[index].balance += params.balance;
     fs.writeFile(global.fileName, JSON.stringify(json));
     res.send(json);
+
+    logger.info(`POST /Account/Transaction -${JSON.stringify(json)}`);
   } catch (err) {
+    logger.error(err);
     res.sendStatus(400).send({ error: err.message });
   }
 });
