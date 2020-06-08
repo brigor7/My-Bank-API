@@ -85,6 +85,9 @@ app.delete('/account/:id', (req, res) => {
         (account) => account.id != req.params.id
       );
       json.accounts = account;
+      fs.writeFile('accounts.json', JSON.stringify(json), (err) => {
+        res.status(400).send({ error: err.message });
+      });
       res.send(json);
     } else {
       res.status(400).send({ error: err.message });
