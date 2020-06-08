@@ -113,3 +113,18 @@ app.put('/account/:id', (req, res) => {
     }
   });
 });
+
+app.post('/account/transaction', (req, res) => {
+  let putAccount = req.body;
+  fs.readFile('accounts.json', 'utf8', (err, data) => {
+    if (!err) {
+      let json = JSON.parse(data);
+      let index = json.accounts.findIndex(
+        (account) => account.id == putAccount.id
+      );
+      json.accounts[index].balance += putAccount.balance;
+    } else {
+      res.status(400).send({ error: err.message });
+    }
+  });
+});
